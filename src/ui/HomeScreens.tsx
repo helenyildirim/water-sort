@@ -131,7 +131,7 @@ export function HomeScreen({
       })}
     >
       <Icon name={icon} size={32} color={GOLD} />
-      <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900', letterSpacing: 0.5 }}>{label}</Text>
+      <Text numberOfLines={2} adjustsFontSizeToFit style={{ color: '#fff', fontSize: 10, fontWeight: '900', letterSpacing: 0.3, textAlign: 'center', paddingHorizontal: 4 }}>{label}</Text>
       {dot ? <View style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: 7, backgroundColor: '#ff3b4d', borderWidth: 2, borderColor: '#fff' }} /> : null}
     </Pressable>
   );
@@ -142,7 +142,7 @@ export function HomeScreen({
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
         {sideBtn('gift', 'DAILY REWARD', onDaily, store.canClaimDaily)}
-        {sideBtn('trophy', 'ACHIEVEMENTS', onAchievements)}
+        {sideBtn('trophy', 'AWARDS', onAchievements)}
       </View>
       <View style={{ alignItems: 'center', marginTop: -16 }}>
         <Logo width={logoW} />
