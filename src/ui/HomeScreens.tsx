@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { Alert, FlatList, Pressable, ScrollView, Switch, Text, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { G } from 'react-native-svg';
 import { backgroundScene } from '../art/backgroundScene';
 import { Icon, IconName } from '../art/Icons';
 import { Logo } from '../art/Logo';
-import { physicsFor } from '../art/geometry';
+import { TUBE_H_RATIO, physicsFor } from '../art/geometry';
 import { renderNode } from '../art/svgRender';
 import { buildTubeScene, glossShadow } from '../art/tubeScene';
 import { THEMES, Theme, themeById } from '../game/themes';
@@ -63,8 +64,8 @@ const DEMO: { color: number; u: number }[][] = [
   [{ color: 4, u: 2 }, { color: 3, u: 1 }],
 ];
 
-function DemoBottles({ width }: { width: number }) {
-  const w = Math.min(60, (width - 40) / 5.4);
+function DemoBottles({ width, maxH }: { width: number; maxH: number }) {
+  const w = Math.max(34, Math.min(60, (width - 40) / 5.4, (maxH - 14) / TUBE_H_RATIO));
   const gap = w * 0.45;
   const ph = physicsFor(w);
   const H = ph.H;
@@ -111,7 +112,12 @@ export function HomeScreen({
 }) {
   const store = useStore();
   const theme = themeById(store.data.theme);
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const logoW = Math.min(270, width - 60);
+  const logoH = logoW * 0.66 - 16;
+  // space left for the demo bottles after the fixed pieces (tab bar ~84)
+  const demoMaxH = height - insets.top - insets.bottom - 84 - (52 + 88 + logoH + 4 + 68 + 16 + 44 + 28);
   const sideBtn = (icon: IconName, label: string, onPress: () => void, dot?: boolean) => (
     <Pressable
       onPress={onPress}
@@ -143,10 +149,10 @@ export function HomeScreen({
         {sideBtn('trophy', 'ACHIEVEMENTS', onAchievements)}
       </View>
       <View style={{ alignItems: 'center', marginTop: -16 }}>
-        <Logo width={Math.min(310, width - 50)} />
+        <Logo width={logoW} />
       </View>
       <View style={{ alignItems: 'center', marginTop: 4 }}>
-        <DemoBottles width={width} />
+        <DemoBottles width={width} maxH={demoMaxH} />
       </View>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
         <GameButton label="PLAY" icon="play" width={250} height={68} fontSize={32} onPress={onPlay} />
