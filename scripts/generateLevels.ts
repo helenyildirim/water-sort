@@ -18,17 +18,23 @@ function mulberry32(seed: number) {
 }
 
 function tier(level: number): { colors: number; empty: number } {
-  if (level <= 3) return { colors: 3, empty: 2 };
-  if (level <= 8) return { colors: 4, empty: 2 };
-  if (level <= 16) return { colors: 5, empty: 2 };
-  if (level <= 30) return { colors: 6, empty: 2 };
-  if (level <= 50) return { colors: 7, empty: 2 };
-  if (level <= 75) return { colors: 8, empty: 2 };
-  if (level <= 110) return { colors: 9, empty: 2 };
-  if (level <= 160) return { colors: 10, empty: 2 };
-  if (level <= 220) return { colors: 11, empty: 2 };
+  if (level <= 2) return { colors: 3, empty: 2 };
+  if (level <= 5) return { colors: 4, empty: 2 };
+  if (level <= 10) return { colors: 5, empty: 2 };
+  if (level <= 18) return { colors: 6, empty: 2 };
+  if (level <= 30) return { colors: 7, empty: 2 };
+  if (level <= 48) return { colors: 8, empty: 2 };
+  if (level <= 75) return { colors: 9, empty: 2 };
+  if (level <= 110) return { colors: 10, empty: 2 };
+  if (level <= 160) return { colors: 11, empty: 2 };
   return { colors: 12, empty: 2 };
 }
+
+// How many solvable candidates to try per level; the hardest one is kept.
+const candidatesFor = (level: number) => (level <= 3 ? 1 : level <= 10 ? 6 : 10);
+
+// Count same-color neighbours inside tubes: fewer = more mixed = harder.
+const clumps = (tubes: number[][]) => tubes.reduce((n, t) => n + t.filter((c, i) => i > 0 && c === t[i - 1]).length, 0);
 
 type Out = { tubes: string[]; par: number };
 const levels: Out[] = [];
@@ -39,8 +45,10 @@ for (let level = 1; level <= LEVEL_COUNT; level++) {
   const rand = mulberry32(level * 7919 + 13);
   const minPar = Math.round(colors * 1.6);
   let made: Out | null = null;
-  for (let attempt = 0; attempt < 400 && !made; attempt++) {
-    // Pick which of the 12 palette colors this level uses (stable but varied).
+  let bestScore = -Infinity;
+  let found = 0;
+  const want = candidatesFor(level);
+  for (let attempt = 0; attempt < 600 && found < want; attempt++) {
     const palette = Array.from({ length: 12 }, (_, i) => i);
     for (let i = palette.length - 1; i > 0; i--) {
       const j = Math.floor(rand() * (i + 1));
@@ -57,14 +65,20 @@ for (let level = 1; level <= LEVEL_COUNT; level++) {
     for (let i = 0; i < colors; i++) tubes.push(units.slice(i * CAP, (i + 1) * CAP));
     for (let i = 0; i < empty; i++) tubes.push([]);
 
-    // No tube may start finished, and avoid 3-of-a-kind stacks on early levels.
     if (tubes.some((t) => t.length === CAP && t.every((x) => x === t[0]))) continue;
-    if (level <= 8 && tubes.some((t) => t.length >= 3 && t[0] === t[1] && t[1] === t[2])) continue;
+    const cl = clumps(tubes);
+    // after the tutorial levels, allow at most one same-colour pair on the board
+    if (level > 3 && cl > 1) continue;
 
     const sol = solve(tubes, 90000);
     if (!sol) continue;
     if (sol.length < minPar) continue;
-    made = { tubes: tubes.map(encodeTube), par: sol.length };
+    found++;
+    const score = sol.length - 3 * cl;
+    if (score > bestScore) {
+      bestScore = score;
+      made = { tubes: tubes.map(encodeTube), par: sol.length };
+    }
   }
   if (!made) throw new Error(`could not generate level ${level}`);
   levels.push(made);
