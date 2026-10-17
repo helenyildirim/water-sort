@@ -8,6 +8,7 @@ import { Backdrop } from './src/ui/Backdrop';
 import { GameScreen } from './src/ui/GameScreen';
 import { HomeScreen, LevelsScreen, MoreScreen, Tab, TabBar, ThemesScreen } from './src/ui/HomeScreens';
 import { AchievementsModal, DailyModal } from './src/ui/Modals';
+import { Splash } from './src/ui/Splash';
 
 function Root() {
   const store = useStore();
@@ -18,6 +19,7 @@ function Root() {
   const [playing, setPlaying] = useState<number | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
   const [modal, setModal] = useState<'daily' | 'ach' | null>(null);
+  const [splash, setSplash] = useState(true);
 
   const homeLevel = Math.min(picked ?? store.unlocked, store.unlocked);
 
@@ -39,6 +41,16 @@ function Root() {
   }, [playing, modal, tab]);
 
   if (!store.ready) return <View style={{ flex: 1, backgroundColor: '#0b2250' }} />;
+
+  if (splash) {
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.stops[2] }}>
+        <StatusBar style="light" />
+        <Backdrop theme={theme} width={width} height={height} />
+        <Splash onDone={() => setSplash(false)} />
+      </View>
+    );
+  }
 
   const start = (n: number) => {
     setPlaying(n);
