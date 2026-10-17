@@ -24,7 +24,7 @@ export function computeLayout(n: number, availW: number, availH: number): BoardL
     const gap = gapFor(per);
     const wByW = availW / (per + (per - 1) * gap);
     const wByH = availH / (TOP + rows * TUBE_H_RATIO + (rows - 1) * GAP_Y + BOTTOM);
-    const w = Math.min(wByW, wByH, 66);
+    const w = Math.min(wByW, wByH, 84);
     if (w > best.w + 0.5) best = { w, per, gap };
   }
   const w = best.w;

@@ -191,7 +191,7 @@ export function GameScreen({ level, onHome, onNext }: Props) {
     <View style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}>
       <View style={{ height: topBar, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16 }}>
         <RoundButton icon="pause" size={44} theme={theme} onPress={() => setPaused(true)} />
-        <View style={{ alignItems: 'center' }}>
+        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' }} pointerEvents="none">
           <Text style={{ color: '#fff', fontSize: 20, fontWeight: '900' }}>Level {level}</Text>
           <Stars count={live} size={18} />
         </View>
