@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Alert, FlatList, Pressable, ScrollView, Switch, Text, View, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { G } from 'react-native-svg';
 import { backgroundScene } from '../art/backgroundScene';
 import { Icon, IconName } from '../art/Icons';
@@ -112,12 +111,9 @@ export function HomeScreen({
 }) {
   const store = useStore();
   const theme = themeById(store.data.theme);
-  const { width, height } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const logoW = Math.min(270, width - 60);
-  const logoH = logoW * 0.66 - 16;
-  // space left for the demo bottles after the fixed pieces (tab bar ~84)
-  const demoMaxH = height - insets.top - insets.bottom - 84 - (52 + 88 + logoH + 4 + 68 + 16 + 44 + 28);
+  const [demoH, setDemoH] = React.useState(0);
   const sideBtn = (icon: IconName, label: string, onPress: () => void, dot?: boolean) => (
     <Pressable
       onPress={onPress}
@@ -151,10 +147,13 @@ export function HomeScreen({
       <View style={{ alignItems: 'center', marginTop: -16 }}>
         <Logo width={logoW} />
       </View>
-      <View style={{ alignItems: 'center', marginTop: 4 }}>
-        <DemoBottles width={width} maxH={demoMaxH} />
+      <View
+        style={{ flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 0 }}
+        onLayout={(e) => setDemoH(e.nativeEvent.layout.height)}
+      >
+        {demoH > 0 ? <DemoBottles width={width} maxH={demoH - 8} /> : null}
       </View>
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+      <View style={{ alignItems: 'center', gap: 14, paddingTop: 6, paddingBottom: 14 }}>
         <GameButton label="PLAY" icon="play" width={250} height={68} fontSize={32} onPress={onPlay} />
         <View
           style={{
