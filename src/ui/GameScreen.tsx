@@ -213,10 +213,10 @@ export function GameScreen({ level, onHome, onNext }: Props) {
       </View>
 
       <View style={{ height: bottomBar, flexDirection: 'row', justifyContent: 'center', gap: 22, paddingTop: 10 }}>
-        <RoundButton icon="undo" label="Undo" theme={theme} onPress={undo} disabled={history.length === 0 || busy} />
-        <RoundButton icon="restart" label="Restart" theme={theme} onPress={restart} disabled={busy} />
-        <RoundButton icon="addTube" label={extraUsed ? 'Used' : 'Add tube'} theme={theme} onPress={addTube} disabled={extraUsed || busy} />
-        <RoundButton icon="bulb" label="Hint" badge={String(HINT_COST)} theme={theme} onPress={giveHint} disabled={busy} />
+        <RoundButton icon="undo" label="Undo" theme={theme} onPress={undo} disabled={history.length === 0} />
+        <RoundButton icon="restart" label="Restart" theme={theme} onPress={restart} />
+        <RoundButton icon="addTube" label={extraUsed ? 'Used' : 'Add tube'} theme={theme} onPress={addTube} disabled={extraUsed} />
+        <RoundButton icon="bulb" label="Hint" badge={String(HINT_COST)} theme={theme} onPress={giveHint} disabled={store.data.coins < HINT_COST} />
       </View>
 
       {toast ? (
