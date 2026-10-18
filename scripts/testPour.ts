@@ -6,7 +6,7 @@ import { animDuration, createAnim, poseAt } from '../src/ui/pour';
 
 let checks = 0;
 let bad = 0;
-for (const [W, Hh] of [[390, 560], [360, 480], [412, 640]]) {
+for (const [W, Hh] of [[390, 560], [360, 480], [412, 640], [412, 700]]) {
   for (let li = 0; li < LEVELS.length; li += 3) {
     const tubes = LEVELS[li].tubes.map(decodeTube);
     const lay = computeLayout(tubes.length, W, Hh);

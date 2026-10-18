@@ -17,17 +17,21 @@ function mulberry32(seed: number) {
   };
 }
 
+// Bigger levels get more spare (empty) bottles so there is always room to move.
+const emptyFor = (colors: number) => (colors <= 6 ? 2 : colors <= 9 ? 3 : 4);
+
 function tier(level: number): { colors: number; empty: number } {
-  if (level <= 2) return { colors: 3, empty: 2 };
-  if (level <= 5) return { colors: 4, empty: 2 };
-  if (level <= 10) return { colors: 5, empty: 2 };
-  if (level <= 18) return { colors: 6, empty: 2 };
-  if (level <= 30) return { colors: 7, empty: 2 };
-  if (level <= 48) return { colors: 8, empty: 2 };
-  if (level <= 75) return { colors: 9, empty: 2 };
-  if (level <= 110) return { colors: 10, empty: 2 };
-  if (level <= 160) return { colors: 11, empty: 2 };
-  return { colors: 12, empty: 2 };
+  let colors = 12;
+  if (level <= 2) colors = 3;
+  else if (level <= 5) colors = 4;
+  else if (level <= 10) colors = 5;
+  else if (level <= 18) colors = 6;
+  else if (level <= 30) colors = 7;
+  else if (level <= 48) colors = 8;
+  else if (level <= 75) colors = 9;
+  else if (level <= 110) colors = 10;
+  else if (level <= 160) colors = 11;
+  return { colors, empty: emptyFor(colors) };
 }
 
 // How many solvable candidates to try per level; the hardest one is kept.
