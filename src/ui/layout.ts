@@ -15,6 +15,7 @@ const gapFor = (per: number) => (per >= 6 ? 0.28 : 0.42);
 const GAP_Y = 0.62;
 const TOP = 0.95; // head room above the first row (lift + pour animation)
 const BOTTOM = 0.25;
+const PAD_X = 18; // keep bottles (and their rims) clear of the screen edges
 
 /** Picks the biggest bottle size that fits `n` bottles into the area. */
 export function computeLayout(n: number, availW: number, availH: number): BoardLayout {
@@ -22,7 +23,7 @@ export function computeLayout(n: number, availW: number, availH: number): BoardL
   for (let per = 1; per <= Math.min(7, n); per++) {
     const rows = Math.ceil(n / per);
     const gap = gapFor(per);
-    const wByW = availW / (per + (per - 1) * gap);
+    const wByW = (availW - 2 * PAD_X) / (per + (per - 1) * gap);
     const wByH = availH / (TOP + rows * TUBE_H_RATIO + (rows - 1) * GAP_Y + BOTTOM);
     const w = Math.min(wByW, wByH, 84);
     if (w > best.w + 0.5) best = { w, per, gap };
