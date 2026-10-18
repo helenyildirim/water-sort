@@ -73,12 +73,15 @@ class Heap {
   }
 }
 
+export type Analysis = { status: 'solved' | 'dead' | 'unknown'; moves: Move[] | null };
+
 /**
- * Weighted A* search. Returns a (near-shortest) list of moves or null if no
- * solution was found within the node limit.
+ * Weighted A* search. `dead` means the whole reachable state space was
+ * exhausted without a solution (no way to win from here); `unknown` means the
+ * node limit was hit first.
  */
-export function solve(start: Tubes, nodeLimit = 120000, weight = 2.2): Move[] | null {
-  if (isSolved(start)) return [];
+export function analyze(start: Tubes, nodeLimit = 120000, weight = 2.2): Analysis {
+  if (isSolved(start)) return { status: 'solved', moves: [] };
   const colors = countColors(start);
   const open = new Heap();
   const best = new Map<string, number>();
@@ -91,9 +94,9 @@ export function solve(start: Tubes, nodeLimit = 120000, weight = 2.2): Move[] | 
     if (isSolved(node.tubes)) {
       const moves: Move[] = [];
       for (let n: Node | null = node; n && n.move; n = n.parent) moves.push(n.move);
-      return moves.reverse();
+      return { status: 'solved', moves: moves.reverse() };
     }
-    if (++expanded > nodeLimit) return null;
+    if (++expanded > nodeLimit) return { status: 'unknown', moves: null };
     const { tubes } = node;
     for (let a = 0; a < tubes.length; a++) {
       const A = tubes[a];
@@ -120,5 +123,10 @@ export function solve(start: Tubes, nodeLimit = 120000, weight = 2.2): Move[] | 
       }
     }
   }
-  return null;
+  return { status: 'dead', moves: null };
+}
+
+/** Returns a (near-shortest) list of moves, or null if none was found. */
+export function solve(start: Tubes, nodeLimit = 120000, weight = 2.2): Move[] | null {
+  return analyze(start, nodeLimit, weight).moves;
 }

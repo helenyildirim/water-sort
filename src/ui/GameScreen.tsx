@@ -5,7 +5,7 @@ import { Coin, Icon } from '../art/Icons';
 import { HINT_COST } from '../config';
 import { LEVELS } from '../game/levelData';
 import { Tubes, applyPour, decodeTube, isSolved, isTubeDone, pourAmount } from '../game/logic';
-import { solve } from '../game/solver';
+import { analyze, solve } from '../game/solver';
 import { themeById } from '../game/themes';
 import { useStore } from '../state/store';
 import { hapticError, hapticLight, hapticSelect, hapticSuccess } from '../util/haptics';
@@ -42,6 +42,7 @@ export function GameScreen({ level, onHome, onNext }: Props) {
   const [paused, setPaused] = useState(false);
   const [win, setWin] = useState<{ stars: number; reward: number; first: boolean } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [stuck, setStuck] = useState(false);
   const pourId = useRef(0);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -74,6 +75,16 @@ export function GameScreen({ level, onHome, onNext }: Props) {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 1800);
   };
+
+  // Dead-end check: tell the player when no pour can ever win from here.
+  useEffect(() => {
+    setStuck(false);
+    if (win || pour) return;
+    const t = setTimeout(() => {
+      if (analyze(tubes, 20000).status === 'dead') setStuck(true);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [tubes, win, pour === null]);
 
   const onTap = (i: number) => {
     if (busy || win || paused) return;
@@ -249,6 +260,37 @@ export function GameScreen({ level, onHome, onNext }: Props) {
             edge="#6a7ba3"
             textColor="#142447"
             onPress={onHome}
+          />
+        </ModalCard>
+      ) : null}
+
+      {stuck && !paused && !win ? (
+        <ModalCard theme={theme} title="No way forward" onClose={() => setStuck(false)}>
+          <Text style={{ color: '#c9d6f2', textAlign: 'center', fontSize: 15 }}>This position can't be solved any more.</Text>
+          {history.length > 0 ? (
+            <GameButton label="UNDO" width={230} onPress={undo} />
+          ) : null}
+          {!extraUsed ? (
+            <GameButton
+              label="ADD TUBE"
+              width={230}
+              height={52}
+              fontSize={20}
+              colors={['#5cc8ff', '#2a8cff']}
+              edge="#1560c4"
+              textColor="#04204d"
+              onPress={addTube}
+            />
+          ) : null}
+          <GameButton
+            label="RESTART"
+            width={230}
+            height={52}
+            fontSize={20}
+            colors={['#c8d4ee', '#97a9d0']}
+            edge="#6a7ba3"
+            textColor="#142447"
+            onPress={restart}
           />
         </ModalCard>
       ) : null}
