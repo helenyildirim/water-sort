@@ -1,5 +1,5 @@
 {
-  "name": "watersort",
+  "name": "color-catch",
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
@@ -15,13 +15,16 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.0",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3"
   },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "tsx scripts/testLogic.ts && tsx scripts/testPour.ts",
+    "typecheck": "tsc --noEmit"
   },
   "private": true
 }

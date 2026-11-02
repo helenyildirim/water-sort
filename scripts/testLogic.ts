@@ -18,3 +18,4 @@ for (let i = 0; i < LEVELS.length; i++) {
 const show = [1, 5, 20, 60, 120, 200, 300];
 for (const l of show) console.log('level', l, 'tubes', LEVELS[l - 1].tubes.length, 'par', LEVELS[l - 1].par);
 console.log(bad === 0 ? 'ALL OK' : `FAILURES: ${bad}`);
+if (bad > 0) process.exit(1);

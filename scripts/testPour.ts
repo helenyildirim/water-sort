@@ -33,3 +33,4 @@ for (const [W, Hh] of [[390, 560], [360, 480], [412, 640], [412, 700]]) {
   }
 }
 console.log('pose checks', checks, bad === 0 ? 'ALL OK' : `FAILURES ${bad}`);
+if (bad > 0) process.exit(1);

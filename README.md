@@ -1,22 +1,44 @@
-# Water Sort
+# Color Catch
 
-Expo (React Native) + TypeScript water-sort puzzle. No ads, no purchases.
+A water-sort puzzle game for Android built with Expo, React Native and TypeScript. It has 300 levels, with no ads and no purchases.
 
-## Run
+## Features
+
+- 300 levels, each checked for a solution
+- Pour animation with liquid physics
+- Detects unwinnable positions and offers Undo, Add Tube or Restart
+- Hints, daily rewards and achievements
+- Bottles, backgrounds, logo and icons drawn in code with SVG
+- Layout adapts to small screens and levels with many bottles
+
+## How it works
+
+- `src/game/` holds the rules, solver, themes and level data, with no UI dependencies.
+- `src/art/` draws the bottles, liquid, backgrounds and icons.
+- `src/ui/` holds the board, pour animation and screens.
+- `src/config.ts` sets the game title, hint cost and rewards.
+- `scripts/generateLevels.ts` generates the levels and uses the solver to keep only solvable ones.
+
+## Run it
 
 ```
 npm install
 npx expo start
 ```
 
-Scan the QR code with Expo Go (Android), or press `a` for an emulator.
+## Tests
 
-## Where things are
+```
+npm test
+npm run typecheck
+```
 
-- `src/game/` - rules, solver, themes, `levelData.ts` (300 levels, all verified solvable)
-- `src/art/` - code-drawn bottles, liquid physics, backdrops, logo, icons
-- `src/ui/` - board + pour animation, game screen, home screens
-- `src/config.ts` - game title, hint cost, daily rewards
-- `scripts/generateLevels.ts` - regenerate levels: `npx tsx scripts/generateLevels.ts`
+`npm test` solves all 300 levels, replays each solution, and checks the pour animation at several screen sizes.
 
-Before publishing change `android.package` in `app.json` (currently `com.watersort.puzzle`).
+## Build
+
+The GitHub Actions workflow builds a release APK when it is run manually.
+
+## Stack
+
+Expo SDK 57, React Native, TypeScript, React Native SVG, AsyncStorage
