@@ -1,5 +1,8 @@
 # Water Sort
 
+[![CI](https://github.com/helenyildirim/water-sort/actions/workflows/ci.yml/badge.svg)](https://github.com/helenyildirim/water-sort/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A water-sort puzzle game for Android built with Expo, React Native and TypeScript. It has 300 levels, with no ads and no purchases.
 
 <p>
@@ -47,3 +50,7 @@ The GitHub Actions workflow builds a release APK when it is run manually.
 ## Stack
 
 Expo SDK 57, React Native, TypeScript, React Native SVG, AsyncStorage
+
+## License
+
+MIT
