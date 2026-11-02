@@ -2,6 +2,11 @@
 
 A water-sort puzzle game for Android built with Expo, React Native and TypeScript. It has 300 levels, with no ads and no purchases.
 
+<p>
+  <img src="docs/home.png" width="260" alt="Home screen" />
+  <img src="docs/game.png" width="260" alt="Game screen" />
+</p>
+
 ## Features
 
 - 300 levels, each checked for a solution
