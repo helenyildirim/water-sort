@@ -4,6 +4,7 @@ import { DAILY_REWARDS, REPLAY_REWARD } from '../config';
 import { LEVELS } from '../game/levelData';
 import { THEMES, themeById } from '../game/themes';
 import { setHapticsEnabled } from '../util/haptics';
+import { setSoundEnabled } from '../util/sound';
 
 export type SaveData = {
   stars: Record<string, number>; // best stars per level
@@ -11,6 +12,7 @@ export type SaveData = {
   owned: string[];
   theme: string;
   haptics: boolean;
+  sound: boolean;
   dailyDate: string;
   dailyStreak: number;
   bestStreak: number;
@@ -22,6 +24,7 @@ const DEFAULTS: SaveData = {
   owned: [THEMES[0].id],
   theme: THEMES[0].id,
   haptics: true,
+  sound: true,
   dailyDate: '',
   dailyStreak: 0,
   bestStreak: 0,
@@ -32,6 +35,12 @@ const KEY = 'watersort:save:v1';
 const pad = (n: number) => String(n).padStart(2, '0');
 export function dateKey(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** The previous calendar day, including across daylight saving changes. */
+export function yesterdayKey(now = new Date()): string {
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  return dateKey(d);
 }
 
 export type Achievement = { id: string; title: string; desc: string; done: boolean; progress: string };
@@ -47,6 +56,7 @@ type Store = {
   buyTheme: (id: string) => boolean;
   setTheme: (id: string) => void;
   setHaptics: (v: boolean) => void;
+  setSound: (v: boolean) => void;
   canClaimDaily: boolean;
   nextDailyReward: number;
   claimDaily: () => { reward: number; streak: number } | null;
@@ -85,6 +95,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!ready) return;
     setHapticsEnabled(data.haptics);
+    setSoundEnabled(data.sound);
     AsyncStorage.setItem(KEY, JSON.stringify(data)).catch(() => {});
   }, [data, ready]);
 
@@ -127,10 +138,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setHaptics = useCallback((v: boolean) => setData((d) => ({ ...d, haptics: v })), []);
+  const setSound = useCallback((v: boolean) => setData((d) => ({ ...d, sound: v })), []);
 
   const today = dateKey(new Date());
   const canClaimDaily = data.dailyDate !== today;
-  const yesterday = dateKey(new Date(Date.now() - 24 * 3600 * 1000));
+  const yesterday = yesterdayKey();
   const streakIfClaimed = data.dailyDate === yesterday ? data.dailyStreak + 1 : 1;
   const nextDailyReward = DAILY_REWARDS[(streakIfClaimed - 1) % DAILY_REWARDS.length];
 
@@ -138,7 +150,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const cur = dataRef.current;
     const t = dateKey(new Date());
     if (cur.dailyDate === t) return null;
-    const y = dateKey(new Date(Date.now() - 24 * 3600 * 1000));
+    const y = yesterdayKey();
     const streak = cur.dailyDate === y ? cur.dailyStreak + 1 : 1;
     const reward = DAILY_REWARDS[(streak - 1) % DAILY_REWARDS.length];
     setData({
@@ -185,6 +197,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     buyTheme,
     setTheme,
     setHaptics,
+    setSound,
     canClaimDaily,
     nextDailyReward,
     claimDaily,

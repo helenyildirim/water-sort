@@ -7,8 +7,10 @@ import { LEVELS } from '../game/levelData';
 import { Tubes, applyPour, decodeTube, isSolved, isTubeDone, pourAmount } from '../game/logic';
 import { analyze, solve } from '../game/solver';
 import { themeById } from '../game/themes';
+import { clearProgress, loadProgress, saveProgress } from '../state/progress';
 import { useStore } from '../state/store';
 import { hapticError, hapticLight, hapticSelect, hapticSuccess } from '../util/haptics';
+import { playSound } from '../util/sound';
 import { Board, PourOrder } from './Board';
 import { CoinPill, GameButton, ModalCard, RoundButton, Stars } from './kit';
 
@@ -47,8 +49,33 @@ export function GameScreen({ level, onHome, onNext }: Props) {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const finished = useRef(false);
+  const [loaded, setLoaded] = useState(false);
 
   const busy = pour !== null;
+
+  // Pick the level up where the player left it.
+  useEffect(() => {
+    let alive = true;
+    loadProgress(level, initial.length).then((saved) => {
+      if (!alive) return;
+      if (saved) {
+        setTubes(saved.tubes);
+        setHistory(saved.history);
+        setMoves(saved.moves);
+        setExtraUsed(saved.extraUsed);
+      }
+      setLoaded(true);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [level, initial.length]);
+
+  useEffect(() => {
+    if (!loaded || win || finished.current) return;
+    if (moves === 0 && !extraUsed) clearProgress(level);
+    else saveProgress(level, { tubes, history, moves, extraUsed });
+  }, [loaded, win, level, tubes, history, moves, extraUsed]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -87,15 +114,17 @@ export function GameScreen({ level, onHome, onNext }: Props) {
   }, [tubes, win, pour === null]);
 
   const onTap = (i: number) => {
-    if (busy || win || paused) return;
+    if (!loaded || busy || win || paused || finished.current) return;
     setHint(null);
     const t = tubes[i];
     if (selected === null) {
       if (t.length > 0 && !isTubeDone(t)) {
         setSelected(i);
         hapticSelect();
+        playSound('select');
       } else {
         hapticError();
+        playSound('invalid');
       }
       return;
     }
@@ -111,12 +140,14 @@ export function GameScreen({ level, onHome, onNext }: Props) {
       setPour({ id: pourId.current, from: selected, to: i, count, color: src[src.length - 1] });
       setSelected(null);
       hapticLight();
+      playSound('pour');
     } else if (t.length > 0 && !isTubeDone(t)) {
       setSelected(i); // switch the selection
       hapticSelect();
     } else {
       setSelected(null);
       hapticError();
+      playSound('invalid');
     }
   };
 
@@ -131,17 +162,21 @@ export function GameScreen({ level, onHome, onNext }: Props) {
     setMoves(m);
     if (isSolved(res.tubes) && !finished.current) {
       finished.current = true;
+      clearProgress(level);
       const stars = starsFor(m, def.par);
       setTimeout(() => {
         const r = store.completeLevel(level, stars);
         hapticSuccess();
+        playSound('win');
         setWin({ stars, reward: r.reward, first: r.first });
       }, 750);
+    } else if (isTubeDone(res.tubes[pour.to])) {
+      playSound('complete');
     }
   };
 
   const undo = () => {
-    if (busy || win || history.length === 0) return;
+    if (busy || win || finished.current || history.length === 0) return;
     const prev = history[history.length - 1];
     const next = prev.map((t) => t.slice());
     while (next.length < tubes.length) next.push([]);
@@ -154,7 +189,7 @@ export function GameScreen({ level, onHome, onNext }: Props) {
   };
 
   const restart = () => {
-    if (busy) return;
+    if (busy || (finished.current && !win)) return;
     setTubes(initial.map((t) => t.slice()));
     setHistory([]);
     setMoves(0);
@@ -166,7 +201,7 @@ export function GameScreen({ level, onHome, onNext }: Props) {
   };
 
   const addTube = () => {
-    if (busy || win || extraUsed) return;
+    if (busy || win || finished.current || extraUsed) return;
     setTubes([...tubes, []]);
     setExtraUsed(true);
     setSelected(null);
@@ -174,7 +209,7 @@ export function GameScreen({ level, onHome, onNext }: Props) {
   };
 
   const giveHint = () => {
-    if (busy || win) return;
+    if (busy || win || finished.current) return;
     if (store.data.coins < HINT_COST) {
       hapticError();
       showToast('Not enough coins for a hint');
@@ -201,7 +236,7 @@ export function GameScreen({ level, onHome, onNext }: Props) {
   return (
     <View style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}>
       <View style={{ height: topBar, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16 }}>
-        <RoundButton icon="pause" size={44} theme={theme} onPress={() => setPaused(true)} />
+        <RoundButton icon="pause" size={44} a11yLabel="Pause" theme={theme} onPress={() => setPaused(true)} />
         <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' }} pointerEvents="none">
           <Text style={{ color: '#fff', fontSize: 20, fontWeight: '900' }}>Level {level}</Text>
           <Stars count={live} size={18} />

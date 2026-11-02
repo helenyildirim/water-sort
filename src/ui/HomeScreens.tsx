@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, FlatList, Pressable, ScrollView, Switch, Text, View, useWindowDimensions } from 'react-native';
 import Svg, { G } from 'react-native-svg';
 import { backgroundScene } from '../art/backgroundScene';
@@ -8,9 +8,10 @@ import { TUBE_H_RATIO, physicsFor } from '../art/geometry';
 import { renderNode } from '../art/svgRender';
 import { buildTubeScene, glossShadow } from '../art/tubeScene';
 import { THEMES, Theme, themeById } from '../game/themes';
+import { clearAllProgress } from '../state/progress';
 import { useStore } from '../state/store';
 import { hapticLight } from '../util/haptics';
-import { CoinPill, GameButton, GOLD, Stars } from './kit';
+import { CoinPill, GameButton, GOLD, ModalCard, Stars } from './kit';
 
 export type Tab = 'home' | 'levels' | 'themes' | 'more';
 
@@ -42,7 +43,14 @@ export function TabBar({ tab, onTab, bottomInset }: { tab: Tab; onTab: (t: Tab) 
       {items.map((it) => {
         const on = it.id === tab;
         return (
-          <Pressable key={it.id} style={{ flex: 1, alignItems: 'center', gap: 4 }} onPress={() => onTab(it.id)}>
+          <Pressable
+            key={it.id}
+            style={{ flex: 1, alignItems: 'center', gap: 4 }}
+            onPress={() => onTab(it.id)}
+            accessibilityRole="tab"
+            accessibilityLabel={it.label}
+            accessibilityState={{ selected: tab === it.id }}
+          >
             <Icon name={it.icon} size={28} color={on ? theme.accent : '#8ea0c4'} />
             <Text style={{ color: on ? theme.accent : '#8ea0c4', fontWeight: '800', fontSize: 12 }}>{it.label}</Text>
             <View style={{ height: 3, width: 34, borderRadius: 2, backgroundColor: on ? theme.accent : 'transparent' }} />
@@ -116,6 +124,8 @@ export function HomeScreen({
   const [demoH, setDemoH] = React.useState(0);
   const sideBtn = (icon: IconName, label: string, onPress: () => void, dot?: boolean) => (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
       onPress={onPress}
       style={({ pressed }) => ({
         width: 78,
@@ -341,6 +351,7 @@ export function ThemesScreen() {
 
 export function MoreScreen() {
   const store = useStore();
+  const [privacy, setPrivacy] = useState(false);
   const theme = themeById(store.data.theme);
   const done = Object.keys(store.data.stars).length;
   const totalStars = Object.values(store.data.stars).reduce((a, b) => a + b, 0);
@@ -371,15 +382,29 @@ export function MoreScreen() {
           </View>
         </View>
         <View style={rowStyle}>
-          <Text style={{ color: '#fff', fontSize: 17, fontWeight: '800' }}>Vibration</Text>
-          <Switch value={store.data.haptics} onValueChange={store.setHaptics} trackColor={{ true: theme.accent, false: '#3a4a70' }} thumbColor="#fff" />
+          <Text style={{ color: '#fff', fontSize: 17, fontWeight: '800' }}>Sound</Text>
+          <Switch accessibilityLabel="Sound" value={store.data.sound} onValueChange={store.setSound} trackColor={{ true: theme.accent, false: '#3a4a70' }} thumbColor="#fff" />
         </View>
+        <View style={rowStyle}>
+          <Text style={{ color: '#fff', fontSize: 17, fontWeight: '800' }}>Vibration</Text>
+          <Switch accessibilityLabel="Vibration" value={store.data.haptics} onValueChange={store.setHaptics} trackColor={{ true: theme.accent, false: '#3a4a70' }} thumbColor="#fff" />
+        </View>
+        <Pressable style={rowStyle} accessibilityRole="button" accessibilityLabel="Privacy" onPress={() => setPrivacy(true)}>
+          <Text style={{ color: '#fff', fontSize: 17, fontWeight: '800' }}>Privacy</Text>
+        </Pressable>
         <Pressable
           style={rowStyle}
           onPress={() =>
             Alert.alert('Reset progress?', 'All levels, coins and themes will be erased.', [
               { text: 'Cancel', style: 'cancel' },
-              { text: 'Reset', style: 'destructive', onPress: store.resetAll },
+              {
+                text: 'Reset',
+                style: 'destructive',
+                onPress: () => {
+                  clearAllProgress();
+                  store.resetAll();
+                },
+              },
             ])
           }
         >
@@ -388,6 +413,14 @@ export function MoreScreen() {
         </Pressable>
         <Text style={{ color: '#7c8db5', textAlign: 'center', marginTop: 12 }}>No ads. No purchases. Just water.</Text>
       </View>
+      {privacy ? (
+        <ModalCard theme={theme} title="Privacy" onClose={() => setPrivacy(false)}>
+          <Text style={{ color: '#d6e0f5', fontSize: 15, lineHeight: 22, textAlign: 'center' }}>
+            Your progress stays on this device. The game collects no personal data and has no ads or trackers.
+          </Text>
+          <GameButton label="CLOSE" width={200} height={50} fontSize={18} onPress={() => setPrivacy(false)} />
+        </ModalCard>
+      ) : null}
     </View>
   );
 }

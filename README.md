@@ -16,6 +16,8 @@ A water-sort puzzle game for Android built with Expo, React Native and TypeScrip
 - Pour animation with liquid physics
 - Detects unwinnable positions and offers Undo, Add Tube or Restart
 - Hints, daily rewards and achievements
+- Level progress is saved, including Undo history
+- Sound effects and haptic feedback
 - Bottles, backgrounds, logo and icons drawn in code with SVG
 - Layout adapts to small screens and levels with many bottles
 

@@ -1,10 +1,12 @@
 {
   "name": "watersort",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.ts",
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
     "expo": "~57.0.30",
+    "expo-asset": "~57.0.20",
+    "expo-audio": "~57.0.5",
     "expo-haptics": "~57.0.3",
     "expo-linear-gradient": "~57.0.2",
     "expo-status-bar": "~57.0.1",

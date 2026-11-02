@@ -32,6 +32,9 @@ export function GameButton({
 }) {
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: !!disabled }}
       onPress={onPress}
       disabled={disabled}
       style={({ pressed }) => [
@@ -58,6 +61,7 @@ export function RoundButton({
   disabled,
   badge,
   label,
+  a11yLabel,
   theme,
   active,
 }: {
@@ -67,12 +71,16 @@ export function RoundButton({
   disabled?: boolean;
   badge?: string;
   label?: string;
+  a11yLabel?: string;
   theme: Theme;
   active?: boolean;
 }) {
   return (
     <View style={{ alignItems: 'center', opacity: disabled ? 0.4 : 1 }}>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={a11yLabel ?? label ?? icon}
+        accessibilityState={{ disabled: !!disabled, selected: !!active }}
         onPress={onPress}
         disabled={disabled}
         style={({ pressed }) => ({

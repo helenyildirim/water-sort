@@ -229,6 +229,9 @@ export function Board({ tubes, selected, hint, width, height, theme, pour, onTap
           <Pressable
             key={`hit${i}`}
             onPress={() => onTap(i)}
+            accessibilityRole="button"
+            accessibilityLabel={`Tube ${i + 1}, ${tubes[i].length} layers`}
+            accessibilityState={{ selected: selected === i }}
             style={{
               position: 'absolute',
               left: p.x - layout.gapX / 2,

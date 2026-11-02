@@ -2,13 +2,13 @@
   "expo": {
     "name": "Water Sort",
     "slug": "water-sort",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.watersort.puzzle"
+      "bundleIdentifier": "com.helen.watersort"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,11 +18,12 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.watersort.puzzle"
+      "package": "com.helen.watersort"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "backgroundColor": "#0b2250"
+    "backgroundColor": "#0b2250",
+    "plugins": ["expo-audio"]
   }
 }

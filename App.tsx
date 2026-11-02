@@ -5,6 +5,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { themeById } from './src/game/themes';
 import { StoreProvider, useStore } from './src/state/store';
 import { Backdrop } from './src/ui/Backdrop';
+import { ErrorBoundary } from './src/ui/ErrorBoundary';
 import { GameScreen } from './src/ui/GameScreen';
 import { HomeScreen, LevelsScreen, MoreScreen, Tab, TabBar, ThemesScreen } from './src/ui/HomeScreens';
 import { AchievementsModal, DailyModal } from './src/ui/Modals';
@@ -107,9 +108,11 @@ function Root() {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <StoreProvider>
-        <Root />
-      </StoreProvider>
+      <ErrorBoundary>
+        <StoreProvider>
+          <Root />
+        </StoreProvider>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }
