@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Color Catch",
-    "slug": "color-catch",
+    "name": "Water Sort",
+    "slug": "water-sort",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

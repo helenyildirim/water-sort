@@ -1,4 +1,4 @@
-# Color Catch
+# Water Sort
 
 A water-sort puzzle game for Android built with Expo, React Native and TypeScript. It has 300 levels, with no ads and no purchases.
 
