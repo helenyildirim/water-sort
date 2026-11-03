@@ -6,6 +6,9 @@ on:
     branches: [main]
     paths: ['.github/workflows/android-apk.yml']
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,7 +39,7 @@ jobs:
 
       - name: Build release APK
         working-directory: android
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -44,3 +47,11 @@ jobs:
           name: water-sort-apk
           path: android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
+
+      - name: Publish it as a release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: Water Sort APK ${{ github.run_number }}
+          body: Installable test build for 64-bit Android phones.
+          files: android/app/build/outputs/apk/release/*.apk

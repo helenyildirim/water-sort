@@ -5,6 +5,8 @@
 
 A water-sort puzzle game for Android built with Expo, React Native and TypeScript. It has 300 levels, with no ads and no purchases.
 
+**[Download the Android APK](https://github.com/helenyildirim/water-sort/releases/latest)**
+
 <p>
   <img src="docs/home.png" width="260" alt="Home screen" />
   <img src="docs/game.png" width="260" alt="Game screen" />
@@ -47,7 +49,7 @@ npm run typecheck
 
 ## Build
 
-The GitHub Actions workflow builds a release APK when it is run manually.
+The GitHub Actions workflow builds a release APK when it is run manually and publishes it under Releases.
 
 ## Stack
 
