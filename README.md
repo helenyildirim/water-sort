@@ -41,8 +41,9 @@ npx expo start
 ## Tests
 
 ```
-npm test
 npm run typecheck
+npm run lint
+npm test
 ```
 
 `npm test` solves all 300 levels, replays each solution, and checks the pour animation at several screen sizes.

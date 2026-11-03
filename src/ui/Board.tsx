@@ -140,6 +140,8 @@ export function Board({ tubes, selected, hint, width, height, theme, pour, onTap
     const nowMs = typeof performance !== 'undefined' ? performance.now() : Date.now();
     animRef.current = createAnim(pour, L.layout, L.ph, tubes[pour.from].length, liftNow, nowMs);
     kick();
+    // Only a new pour should start an animation; everything else is read from `live`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pourId]);
 
   // ---- render ---------------------------------------------------------------

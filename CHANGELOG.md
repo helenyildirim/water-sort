@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added ESLint and run it in CI
+
 ## 1.1.0
 
 - A level now resumes where you left it, including Undo history

@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Animated, Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { useAnimatedValue } from './useAnimatedValue';
 import { Coin, Icon, IconName } from '../art/Icons';
 import type { Theme } from '../game/themes';
 
@@ -143,8 +144,8 @@ export function ModalCard({
   onClose?: () => void;
   width?: number;
 }) {
-  const scale = useRef(new Animated.Value(0.88)).current;
-  const fade = useRef(new Animated.Value(0)).current;
+  const scale = useAnimatedValue(0.88);
+  const fade = useAnimatedValue(0);
   useEffect(() => {
     Animated.parallel([
       Animated.spring(scale, { toValue: 1, friction: 7, useNativeDriver: true }),

@@ -1,15 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Pressable, View, useWindowDimensions } from 'react-native';
 import { Logo } from '../art/Logo';
+import { useAnimatedValue } from './useAnimatedValue';
 
 const SHOW_MS = 1900;
 
 /** Logo intro shown once at launch, before the home screen. Tap to skip. */
 export function Splash({ onDone }: { onDone: () => void }) {
   const { width } = useWindowDimensions();
-  const intro = useRef(new Animated.Value(0)).current; // logo pop-in
-  const bar = useRef(new Animated.Value(0)).current; // loading bar
-  const out = useRef(new Animated.Value(1)).current; // whole splash fade-out
+  const intro = useAnimatedValue(0); // logo pop-in
+  const bar = useAnimatedValue(0); // loading bar
+  const out = useAnimatedValue(1); // whole splash fade-out
   const done = useRef(false);
 
   const finish = () => {
