@@ -44,7 +44,7 @@ export function GameScreen({ level, onHome, onNext }: Props) {
   const [paused, setPaused] = useState(false);
   const [win, setWin] = useState<{ stars: number; reward: number; first: boolean } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [stuck, setStuck] = useState(false);
+  const [stuckOn, setStuckOn] = useState<Tubes | null>(null);
   const pourId = useRef(0);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -104,14 +104,16 @@ export function GameScreen({ level, onHome, onNext }: Props) {
   };
 
   // Dead-end check: tell the player when no pour can ever win from here.
+  // The warning belongs to one board, so any new move clears it on its own.
+  const pouring = pour !== null;
+  const stuck = stuckOn === tubes && !pouring;
   useEffect(() => {
-    setStuck(false);
-    if (win || pour) return;
+    if (win || pouring) return;
     const t = setTimeout(() => {
-      if (analyze(tubes, 20000).status === 'dead') setStuck(true);
+      if (analyze(tubes, 20000).status === 'dead') setStuckOn(tubes);
     }, 350);
     return () => clearTimeout(t);
-  }, [tubes, win, pour === null]);
+  }, [tubes, win, pouring]);
 
   const onTap = (i: number) => {
     if (!loaded || busy || win || paused || finished.current) return;
@@ -300,8 +302,8 @@ export function GameScreen({ level, onHome, onNext }: Props) {
       ) : null}
 
       {stuck && !paused && !win ? (
-        <ModalCard theme={theme} title="No way forward" onClose={() => setStuck(false)}>
-          <Text style={{ color: '#c9d6f2', textAlign: 'center', fontSize: 15 }}>This position can't be solved any more.</Text>
+        <ModalCard theme={theme} title="No way forward" onClose={() => setStuckOn(null)}>
+          <Text style={{ color: '#c9d6f2', textAlign: 'center', fontSize: 15 }}>This position can&apos;t be solved any more.</Text>
           {history.length > 0 ? (
             <GameButton label="UNDO" width={230} onPress={undo} />
           ) : null}
@@ -358,7 +360,7 @@ function WinCard({
 }) {
   const store = useStore();
   const theme = themeById(store.data.theme);
-  const pops = useRef([0, 1, 2].map(() => new Animated.Value(0))).current;
+  const [pops] = useState(() => [0, 1, 2].map(() => new Animated.Value(0)));
   useEffect(() => {
     Animated.stagger(
       200,

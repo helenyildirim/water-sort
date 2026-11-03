@@ -70,6 +70,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<SaveData>(DEFAULTS);
   const [ready, setReady] = useState(false);
   const dataRef = useRef(data);
+  // Actions read the latest save without waiting for a re-render.
+  // eslint-disable-next-line react-hooks/refs
   dataRef.current = data;
 
   useEffect(() => {

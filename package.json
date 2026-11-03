@@ -17,6 +17,8 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.0",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~57.0.2",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3"
   },
@@ -26,7 +28,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "tsx scripts/testLogic.ts && tsx scripts/testPour.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "expo lint"
   },
   "private": true
 }
